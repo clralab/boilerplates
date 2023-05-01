@@ -20,6 +20,7 @@ Turn on SNMP in the Synology NAS and set up a username and password.
 4) Re-deploy the stack, restart prometheus, and check that it is running:
 
 	a) Go to port 9090 on the server
+
 	b) Click Status -> Targets
 
 There should be a target called "snmp_exporter" and an endpoint with the NAS as the target in the "Up" state.
@@ -28,3 +29,5 @@ There should be a target called "snmp_exporter" and an endpoint with the NAS as 
 
 Under the Grafana boilerplate there is an example dashboard for viewing the Synology NAS data.
 This dashboard is also available on the Grafana template website.
+
+https://grafana.com/grafana/dashboards/18643-synology-snmp/
