@@ -1,0 +1,31 @@
+version: '3.8'
+
+volumes:
+  vol_local:
+    driver: local
+
+  vol_nfs_prometheus:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=192.168.1.20,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/prometheus"
+
+networks:
+  bridge_prometheus:
+    external: true
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    networks:
+        bridge_prometheus:
+    ports:
+      - "9090:9090"
+    volumes:
+      - vol_nfs_prometheus:/etc/prometheus
+      - vol_local:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    restart: always

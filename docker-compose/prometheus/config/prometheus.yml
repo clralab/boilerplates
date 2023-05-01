@@ -1,0 +1,40 @@
+global:
+  scrape_interval: 15s # By default, scrape targets every 15 seconds.
+
+scrape_configs:
+  # Job for scraping prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Job for scraping node_exporter
+  #- job_name: 'node_exporter'
+  #  static_configs:
+  #    - targets: ['node_exporter:9100']
+
+  # Job for scraping cadvisor (as linked to host network must use host IP)
+  #- job_name: 'cadvisor'
+  #  static_configs:
+  #    - targets: ['192.168.1.50:8080'] # Host IP
+
+  # Job for scraping nvidia-exporter
+  #- job_name: 'nvidia_exporter'
+  #  static_configs:
+  #    - targets: ['nvidia_exporter:9400']
+
+  # Job for scraping snmp_exporter
+  #- job_name: snmp_exporter
+  #  static_configs:
+  #    - targets: ['192.168.1.20']  # NAS IP
+  #  metrics_path: /snmp
+  #  params:
+  #    module: [synology]
+  #  relabel_configs:
+  #    - source_labels: [__address__]
+  #      target_label: __param_target
+  #    - source_labels: [__param_target]
+  #      target_label: instance
+  #    - source_labels: [__param_target]
+  #      regex: (.*)
+  #      replacement: snmp_exporter:9116
+  #      target_label: __address__

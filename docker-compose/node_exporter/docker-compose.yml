@@ -1,0 +1,18 @@
+version: '3.8'
+
+networks:
+  bridge_prometheus:
+    external: true
+
+services:
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    networks:
+      bridge_prometheus:
+    command:
+      - '--path.rootfs=/host'
+    pid: host
+    restart: always
+    volumes:
+      - '/:/host:ro,rslave'

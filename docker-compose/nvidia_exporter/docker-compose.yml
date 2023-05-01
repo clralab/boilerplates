@@ -1,0 +1,21 @@
+version: '3.8'
+
+networks:
+  bridge_prometheus:
+    external: true
+
+services:
+  nvidia_exporter:
+    image: nvcr.io/nvidia/k8s/dcgm-exporter:3.1.7-3.1.4-ubuntu20.04
+    container_name: nvidia_exporter
+    runtime: nvidia
+    cap_add:
+      - SYS_ADMIN
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    networks:
+      bridge_prometheus:
+    ports:
+      - "9400:9400"
+    restart: always
