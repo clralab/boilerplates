@@ -1,5 +1,6 @@
-# Minecraft Readme
+# Minecraft Bedrock Readme
 
+This will install a Minecraft Bedrock Server in a Docker container.
 Use the docker compose file to create the volumes and container.
 
 ## Prerequisites
@@ -58,3 +59,14 @@ This will download the latest version of Minecraft Server and set up the files.
 
 5) Restart the container after changing any properties to take effect.
 
+## Optional Mods
+
+<a href="https://foxynotail.com/">Foxynotail</a> has many great mods for Bedrock servers.
+We are using:
+
+- mini blocks
+- mob heads
+- one player sleep
+- markers
+
+Please follow any instructions on his site or discord for information as these change often with new versions.
