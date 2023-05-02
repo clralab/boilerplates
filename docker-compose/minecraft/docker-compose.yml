@@ -1,0 +1,28 @@
+version: '3.8'
+
+volumes:
+  vol_prod:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=192.168.1.20,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_minecraft"
+
+networks:
+  mvl1-docker:
+    external: true
+
+services:
+  minecraft:
+    image: itzg/minecraft-bedrock-server
+    container_name: minecraft
+    networks:
+      mvl1-docker:
+        ipv4_address: 192.168.1.53
+    ports:
+      - "19132:19132/udp"
+    volumes:
+      - vol_prod:/data
+    environment:
+      - EULA=TRUE
+    restart: always
