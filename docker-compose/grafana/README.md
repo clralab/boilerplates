@@ -7,7 +7,7 @@ Use the docker compose file to create the volumes and container.
 My personal preference is to isolate application stacks on their own networks.
 For Grafana, I like to set this up on a macvlan. This gives a static IP on my home network.
 
-There are two rasons for this:
+There are two reasons for this:
 
 1) The default port for Grafana is 3000 and this can conflict with other services like Gitea
 
