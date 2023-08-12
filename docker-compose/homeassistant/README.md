@@ -43,9 +43,13 @@ To do this:
 2) Edit the NFS Permissions by selecting the folder, clicking edit, and then NFS Permissions
 
 	a) Hostname or IP: 10.0.2.20 (the IP address of the Docker Server
+	
 	b) Privilage: Read/Write
+	
 	c) Squash: No Mapping
+	
 	d) Security: sys
+	
 	e) Check: Enable asynchronous and Allow users to access mounted subfolders
 
 > :warning: Note: Some Docker Containers require different a Squash setup such as Minecraft.
@@ -58,11 +62,13 @@ While most of my containers are set up under the Production NFS Folder, some con
 2) Create a new stack in Portainer, name it "homeassistant" and copy the docker-compose code into Web editor.
 
 	a) Update the volume to match the folder created on the NFS
+	
 	b) update the IP address to a static IP outside your DHCP range
 
 3) Deploy the stack and check that it is running:
 
 	a) Go to port 8123 on the IP address updated in the stack 
+	
 	b) Create an account
 
 ### Allow CloudFlare Tunnel Connection
