@@ -28,6 +28,7 @@ scrape_configs:
   #    - targets: ['192.168.1.20']  # NAS IP
   #  metrics_path: /snmp
   #  params:
+  #    auth: [public_v3]
   #    module: [synology]
   #  relabel_configs:
   #    - source_labels: [__address__]
