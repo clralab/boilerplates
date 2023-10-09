@@ -1,4 +1,4 @@
-# docker-homeassistant readme
+﻿# docker-homeassistant readme
 
 Docker compose file for setting up Home Assistant and instructions for adding a Breville Smart Dehumidifier.
 
@@ -42,7 +42,7 @@ To do this:
 
 2) Edit the NFS Permissions by selecting the folder, clicking edit, and then NFS Permissions
 
-	a) Hostname or IP: 10.0.2.20 (the IP address of the Docker Server
+	a) Hostname or IP: 10.0.2.20 (the IP address of the Docker Server)
 	
 	b) Privilage: Read/Write
 	
@@ -82,7 +82,7 @@ http:
     - 10.0.2.xxx
 ```
 
-## Setting up Breville Dehumidifier
+## Setting up LocalTuya Smart Devices
 
 ### Set up HACS
 
@@ -114,7 +114,16 @@ on Youtube
 
 LocalTuya will be available in HACS through the Explore and Download Repositories.
 
-### Add the Dehumidifier
+Through the process you will need to find each device's "Local Key". This can be found online in the Tuya IoT Platform API Explorer. 
+First, under Cloud Development, copy the Device ID, you will need this for the next step.
+
+To get the devices local key, go to:
+
+Cloud -> API Explorer -> Device Management -> Query Device Details -> Enter Device ID -> Submit Request
+
+There will be a field on the right under the details called "local_key".
+
+### Add the Breville Smart Dry Connect Dehumidifier LAD208WHT2IAN1
 
 The below entity table is courtesy of Yunseok_Oh from the
 <a href="https://community.home-assistant.io/t/breville-smart-dry-connect-dehumidifier/401008/12">HomeAssistant Community</a>
@@ -131,7 +140,28 @@ The below entity table is courtesy of Yunseok_Oh from the
 | 12	    | TImer	        | select	    | 0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24 - Off;1 hour;2 hours;3 hours;4 hours;5 hours;6 hours;7 hours;8 hours;9 hours;10 hours;11 hours;12 hours;13 hours;14 hours;15 hours;16 hours;17 hours;18 hours;19 hours;20 hours;21 hours;22 hours;23 hours;24 hours	
 | 101	    | Timer	        | binary_sensor	| -	                                            | 
 | 102	    | Night Mode    | switch	    | -	                                            | 
-| 103	    | Temperature   | sensor	    | Device Class: temperature, Unit: �	        | 
+| 103	    | Temperature   | sensor	    | Device Class: temperature, Unit: °	        | 
 | 104	    | Humidity      | sensor	    | Device Class: humidity, Unit: %	            | 
 | 105	    | Defrost       | binary_sensor	| -                                             | 
+
+### Add the Breville Smart Air Purifier LAP408WHT
+
+Entity table for the Air Purifier:
+
+| Entity	| Name	        | Platform	    | Value	                                        | Note
+| ---       | ---           | ---           | ---                                           | ---
+| 1				| Power					| switch			| -	
+| 2				| PM2.5 Level		| sensor			| -			| Unit μg/m³ Scaling Factor 0.1 
+| 3				| Mode					| select			| 1;2 - Manual;Auto	
+| 4				| Fan Speed			| select			| 1;2;3;4 - Low;Medium;High;Turbo	
+| 8				| Night Mode		| switch			| -	
+| 9				| Microbe Sheild	| switch			| -	
+| 11			| Reset Filter	| switch			| -	
+| 16			| Filter Left Days	| sensor			| -	
+| 19			| Timer					| select			| cancle;2H;4H;12H - Off;2 hour;4 hours;12 hours	
+| 20			| Left Time			| sensor			| -			| Unit Mins
+| 21			| Warning				| binary_sensor			| 0;1 - OK;Replace Filter	
+| 22			| Air Quality		| sensor			| 1;2;3;4 - Very Good;Good;Fair;Poor	
+
+> :warning: Note that the timer has a spelling mistake. This is correct and must match the device value.
 
