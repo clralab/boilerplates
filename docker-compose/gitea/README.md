@@ -47,31 +47,45 @@ While this can be an issue for containers such as Grafana that might need to acc
 1) Create the NFS folder on the NAS
 
 	a) Open the Synology DSM web interface.
+	
 	b) Go to "Control Panel" > "File Services" > "NFS".
+	
 	c) Ensure NFS is enabled or click Enable NFS service, select NFS 4.0 or higher, and click "Apply".
+	
 	d) Go to "Control Panel" > "Shared Folder".
+	
 	e) Click "Create" to add a new shared folder.
+	
 	f) Set the folder path and name.
+	
 	g) Click "NFS Permissions" and set the permissions for the folder.
+	
 	h) Set the NFS Hostname to the Docker Server Host (not macvlan), host access to "Read/Write", squash to "Map all users to admin", select "Enable asynchronous" and "Allow users to access mounted subfolders", and finally click "Save".
 
 2) Create the database and user
 
 	a) Install MariaDB on the Synology.
+	
 	b) Install and configure phpMyAdmin on the Synology.
+	
 	b) Create a new database with the "utf8_general_ci" collation.
+	
 	c) Create a new user with restricted access to the database.
 
 3) Create a new stack in Portainer, name it "gitea" and copy the docker-compose code into Web editor.
 
 	a) Update the volume to match the folder created on the NFS
+	
 	b) update the IP address to a static IP outside your DHCP range
 
 4) Deploy the stack and check that it is running:
 
 	a) Go to port 3000 on the IP address updated in the stack 
+	
 	b) Follow the on-screen instructions to set up the Gitea administrator account.
+	
 	c) Select the database that was created in Step 2.
+	
 	d) Configure the email and server settings if necessary.
 
 ## Optional Configuration
