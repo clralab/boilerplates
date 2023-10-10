@@ -1,4 +1,4 @@
-version: "3.8"
+version: "2.1"
 
 volumes:
   vol_prod:
@@ -6,27 +6,24 @@ volumes:
     driver_opts:
       type: nfs
       o: addr=10.0.2.10,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
-      device: ":/volume1/nfs_docker_gitea"
+      device: ":/volume1/nfs_docker_prod/heimdall"
 
 networks:
   clra_macvlan:
     external: true
 
 services:
-  gitea:
-    image: gitea/gitea:latest
-    container_name: gitea
+  heimdall:
+    image: lscr.io/linuxserver/heimdall:latest
+    container_name: heimdall
     networks:
       clra_macvlan:
-        ipv4_address: 10.0.2.22
-    ports:
-      - "3000:3000"
-      - "22:22"
-    volumes:
-      - vol_prod:/data
+        ipv4_address: 10.0.2.26
     environment:
-      - DB_TYPE=mysql
-      - DB_HOST=10.0.2.10:3306
-      - DB_NAME= "[Gitea Database Name]"
-      - DB_USER= "[Gitea User Name]"
-    restart: always
+      - TZ=Australia/Sydney
+    volumes:
+      - vol_prod:/config
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
