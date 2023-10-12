@@ -1,0 +1,44 @@
+version: '3.5'
+
+volumes:
+  vol_prod_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/bind9/config"
+  vol_prod_cache:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/bind9/cache"
+  vol_prod_records:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/bind9/records"
+
+networks:
+  clra_macvlan:
+    external: true
+
+services:
+  bind9:
+    image: ubuntu/bind9:latest
+    container_name: bind9
+    networks:
+      clra_macvlan:
+        ipv4_address: 10.0.2.10
+    environment:
+      - BIND9_USER=root
+      - TZ=Australia/Sydney
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    volumes:
+      - vol_prod_config:/etc/bind/
+      - vol_prod_cache:/var/cache/bind
+      - vol_prod_records:/var/lib/bind
+    restart: always
