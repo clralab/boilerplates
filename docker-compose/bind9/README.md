@@ -1,4 +1,4 @@
-# Uptime Bind9
+# Bind9
 
 Use the docker compose file to create the volumes and container.
 
