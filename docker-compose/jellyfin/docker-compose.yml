@@ -1,0 +1,50 @@
+version: '3.5'
+
+volumes:
+  vol_prod_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/jellyfin/config"
+  vol_prod_cache:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/jellyfin/cache"
+  vol_media:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,ro,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/video"
+
+networks:
+  clra_macvlan:
+    external: true
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    networks:
+      clra_macvlan:
+        ipv4_address: 10.0.2.29
+    volumes:
+      - vol_prod_config:/config
+      - vol_prod_cache:/cache
+      - vol_media:/media:ro
+    restart: 'unless-stopped'
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - count: all
+              capabilities: [ gpu ]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
