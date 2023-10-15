@@ -87,7 +87,8 @@ My preference is to keep SSH turned off on the Synology NAS though, so I edit th
 
 5) Test the configuration.
 
-	a) Open a terminal on your personal computer and run an nslookup, making sure to reference the assigned IP address.	It should return a Non-authoritative answer successfully.
+	a) Open a terminal on your personal computer and run an nslookup, making sure to reference the assigned IP address.
+	It should return a Non-authoritative answer successfully.
 
 	```
 	 nslookup youtube.com 10.0.2.10
