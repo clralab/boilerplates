@@ -15,13 +15,15 @@ There are three reasons for this:
 
 3) Setting up a zero trust tunnel with a provider like Cloudflare is a bit easier (not relevant for Bind9)
 
-A macvlan can be created using the following code:
+A macvlan can be created using the following code (updated to include IPv6 support):
 
 ```
 docker network create -d macvlan \
---subnet 192.168.1.0/24 \
---gateway 192.168.1.1 \
+--subnet 10.0.2.0/24 --gateway 10.0.2.1 \
+--subnet=2001:db8:cafe::/64 --gateway=2001:db8:cafe::1 \
 -o parent=eno1 \
+-o macvlan_mode=bridge \
+--ipv6 \
 clra_macvlan
 ```
 

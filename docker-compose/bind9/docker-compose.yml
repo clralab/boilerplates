@@ -31,6 +31,7 @@ services:
     networks:
       clra_macvlan:
         ipv4_address: 10.0.2.10
+        ipv6_address: 2001:db8:cafe::10
     environment:
       - BIND9_USER=root
       - TZ=Australia/Sydney
