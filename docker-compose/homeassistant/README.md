@@ -1,4 +1,4 @@
-﻿# docker-homeassistant readme
+﻿# HomeAssistant Readme
 
 Docker compose file for setting up Home Assistant and instructions for adding a Breville Smart Dehumidifier.
 
@@ -82,7 +82,7 @@ http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 10.0.2.xxx
-		- 10.0.2.yyy
+    - 10.0.2.yyy
 ```
 
 ## Setting up LocalTuya Smart Devices
