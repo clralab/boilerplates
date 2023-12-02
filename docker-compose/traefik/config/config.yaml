@@ -1,0 +1,15 @@
+http:
+  routers:
+    dsm-router: # Synology DSM Router
+      entryPoints:
+        - websecure
+      rule: "Host(`dsm.domain`)"
+      service: dsm-service
+      tls:
+        certResolver: production
+  services:
+    dsm-service: # Synology DSM Service
+      loadbalancer:
+        passHostHeader: true
+        servers:
+          - url: "https://10.0.2.15:5001"

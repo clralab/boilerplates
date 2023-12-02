@@ -11,8 +11,8 @@ volumes:
 networks:
   clra_macvlan:
     external: true
-  traefik_bridge:
-    external: true
+  # traefik_bridge:
+  #   external: true
 
 services:
   traefik:
@@ -21,7 +21,7 @@ services:
     networks:
       clra_macvlan:
         ipv4_address: 10.0.2.12
-      traefik_bridge:
+    #   traefik_bridge:
     ports:
       - 80:80
       - 443:443
