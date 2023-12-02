@@ -13,13 +13,15 @@ There are three reasons for this:
 
 2) Setting up a zero trust tunnel with a provider like Cloudflare is a bit easier
 
-A macvlan can be created using the following code:
+A macvlan can be created using the following code (updated to include IPv6 support):
 
 ```
 docker network create -d macvlan \
---subnet 10.0.2.0/24 \
---gateway 10.0.2.1 \
+--subnet 10.0.2.0/24 --gateway 10.0.2.1 \
+--subnet=2001:db8:cafe::/64 --gateway=2001:db8:cafe::1 \
 -o parent=eno1 \
+-o macvlan_mode=bridge \
+--ipv6 \
 clra_macvlan
 ```
 
@@ -71,15 +73,16 @@ While most of my containers are set up under the Production NFS Folder, some con
 	
 	b) Create an account
 
-### Allow CloudFlare Tunnel Connection
+### Allow CloudFlare Tunnel and Traefik Connection
 
-Add the following to configuration.yml updating the IP address to the container hosting the CloudFlare tunnel:
+Add the following to configuration.yaml updating the IP address to the container hosting the CloudFlare tunnel and Traefik:
 
 ```
 http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 10.0.2.xxx
+		- 10.0.2.yyy
 ```
 
 ## Setting up LocalTuya Smart Devices

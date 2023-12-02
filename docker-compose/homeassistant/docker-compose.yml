@@ -9,7 +9,7 @@ volumes:
     driver: local
     driver_opts:
       type: nfs
-      o: addr=10.0.2.10,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
       device: ":/volume1/nfs_docker_prod/home_assistant"
 
 services:
@@ -24,3 +24,11 @@ services:
     networks:
       clra_macvlan:
         ipv4_address: 10.0.2.24
+        ipv6_address: 2001:db8:cafe::24
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homeassistant.entrypoints=websecure"
+      - "traefik.http.routers.homeassistant.rule=Host(`homeassistant.homelab.domain.com`)"
+      - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
+      - "traefik.http.routers.homeassistant.tls=true"
+      - "traefik.http.routers.homeassistant.tls.certresolver=production"
