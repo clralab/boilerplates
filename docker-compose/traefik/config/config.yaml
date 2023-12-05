@@ -13,3 +13,15 @@ http:
         passHostHeader: true
         servers:
           - url: "https://10.0.2.15:5001"
+tcp:
+  routers:
+    vpn-router: # Synology OpenVPN Router
+      entryPoints:
+        - websecure
+      rule: "HostSNI(`*`)"
+      service: vpn-service
+  services:
+    vpn-service: # Synology OpenVPN Service
+      loadbalancer:
+        servers:
+          - address: "10.0.2.15:1194"

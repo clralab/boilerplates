@@ -92,5 +92,4 @@ providers:
   file:
     # -- (Optional) Use this for static routing and services outside Docker
     directory: /etc/traefik
-    filename: config.yaml
     watch: true
