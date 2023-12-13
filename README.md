@@ -10,8 +10,9 @@ However, I will be trying my best to keep this as up to date as possible. If it 
 ## Home Lab Setup
 
 My underlying system setup consists of a physical development server and a production server.
-Both of these computers are running Lubuntu LTS.
-There is a Synology 220j NAS that acts as a File Server, DHCP, DNS, and NFS for Docker Volumes.
+Both of these computers are running Lubuntu LTS and are running Docker containers.
+There is a Synology 220j NAS that acts as a File Server and NFS for Docker Volumes.
+DNS is being managed by a Bind9 container. DHCP and Vlans are managed by the physical router.
 
 ## Resources
 
