@@ -54,3 +54,23 @@ Update the Docker daemon /etc/docker/daemon.json. This file may or may not exist
   }
 }
 ```
+
+## Connect to Grafana for dashboard reporting
+
+Grafana is a prerequisite for this step. Follow the instructions in the Grafana boilerplate to get it set up.
+
+Make sure that Grafana is connected to the same network as Loki. In the above example, the clra_bridge.
+
+Add a new data connection that references the container name for Loki:
+
+1) Name = Loki
+
+2) URL = http://loki:3100
+
+Save and test. It should give a green success status.
+
+Example, create a timeseries graph with the query:
+
+```
+count_over_time({container_name="bind9"}[$__auto])
+```
