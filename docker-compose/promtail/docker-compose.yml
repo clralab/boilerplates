@@ -1,0 +1,36 @@
+version: '3.8'
+
+volumes:
+  vol_nfs_promtail:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/promtail"
+
+  # Example traefik log folder volume for local scraping 
+  vol_nfs_traefik:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,ro,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/traefik/config/log"
+
+networks:
+  clra_bridge:
+    external: true
+
+services:
+  promtail:
+    image: grafana/promtail:2.9.3
+    container_name: promtail
+    networks:
+        clra_bridge:
+    volumes:
+      - /var/log:/var/log
+      - vol_nfs_promtail:/etc/promtail
+      # Example map traefik log folder for local scraping 
+      - vol_nfs_traefik:/mnt/traefik 
+    command:
+      - "--config.file=/etc/promtail/promtail-config.yml"
+    restart: unless-stopped

@@ -1,0 +1,27 @@
+version: '3.8'
+
+volumes:
+  vol_nfs_loki:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/loki"
+
+networks:
+  clra_bridge:
+    external: true
+
+services:
+  loki:
+    image: grafana/loki:2.9.3
+    container_name: loki
+    networks:
+        clra_bridge:
+    ports:
+      - "3100:3100"
+    volumes:
+      - vol_nfs_loki:/etc/loki
+    command:
+      - "--config.file=/etc/loki/loki-config.yml"
+    restart: unless-stopped
