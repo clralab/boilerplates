@@ -28,3 +28,4 @@ services:
     environment:
       - USERNAME=test
       - PASSWORD=ChangeMe
+      - ESPHOME_DASHBOARD_USE_PING=true
