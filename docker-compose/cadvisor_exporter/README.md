@@ -27,3 +27,9 @@ There should be a target called "cadvisor_exporter" and an endpoint localhost:80
 
 Under the Grafana boilerplate there is an example dashboard for cadvisor.
 This dashboard is also available on the Grafana template website.
+
+## Shoutout and thanks
+
+Special thanks to paaacman for the additional commands. These reduced my average Cadvisor CPU usage from 11.7% down to around 2.7%.
+
+<a href="https://github.com/google/cadvisor/issues/2523">(Relatively) high CPU usage for the cadvisor container</a>

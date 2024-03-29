@@ -13,6 +13,9 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
+    command:
+      - '-housekeeping_interval=10s'
+      - '-docker_only=true'
     devices:
       - /dev/kmsg
     restart: always
