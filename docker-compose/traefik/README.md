@@ -4,6 +4,8 @@ Use the docker compose file to create the volumes and container.
 
 ## Prerequisites
 
+### Networking
+
 My personal preference is to isolate application stacks on their own networks.
 For Traefik, I like to set this up on a macvlan. This gives a static IP on my home network.
 
@@ -36,7 +38,87 @@ There is a great explaination on
 and also in the 
 <a href="https://docs.docker.com/v17.09/engine/userguide/networking/get-started-macvlan/" rel="noreferrer" title="Docker Macvlan Documentation">Docker Macvlan Documentation</a>.
 
-This can be an issue for containers such as Traefik if you need to access the host, so you may wish to add multiple networks.
+This can be an issue for containers such as Traefik that may try to access the host.
+
+If containers are on multiple networks, such as Authentik on the front-end macvlan and back-end bridge, Traefik may try to connect to the bridge (host) from the macvlan (isolated) and result in a Bad Gateway error.
+
+Thanks so much to <a href="https://community.traefik.io/t/docker-provider-how-does-traefik-choose-which-service-ip-address-to-proxy-to-when-container-is-on-multiple-networks/16852">candlerb</a> for figuring this out!
+
+There are three ways I have found to fix this:
+
+1) Add an explicit network in the traefik.yaml file:
+
+```
+docker:
+  exposedByDefault: false
+  network: clra_macvlan
+```
+
+2) Add the Traefik container to both the front-end and back-end networks:
+
+```
+networks:
+  clra_macvlan:
+    external: true
+  clra_bridge:
+    external: true
+
+services:
+  traefik:
+    networks:
+      clra_macvlan:
+        ipv4_address: 10.0.2.12
+      clra_bridge:
+```
+
+3) Add an explicit network to the containers Traefik labels:
+
+```
+labels:
+  - "traefik.enable=true"
+	...
+  - "traefik.docker.network=clra_macvlan"
+```
+
+Once a method has been set up, this can be tested by installing and using Curl from the Traefik console:
+
+```
+apk add --no-cache curl
+curl -v http://<service ip><service port>
+```
+
+
+I have personally chosen to go with Option 1. The benefits for me is using Traefik as a reverse proxy to route traffic from the internet.
+There is no need, at this stage, for me to resolve, get an SSL certificate, and/or route traffic from the internet to my back-end services.
+Or even my front-end services that I only plan to access when locally connected. Network config in the Traefik yaml saves me from forgetting labels.
+
+Access to services can be overly simply summarised as:
+
+1) Front-end with access from the internet 
+
+	a) Connected to Docker front-end network (and possibly back-end as well)
+
+	b) Externally resolved with Cloudflare
+	
+	c) Internally resolved with Bind9
+	
+	d) SSL and routing through Traefik
+	
+	e) Secured through Authentik
+
+2) Front-end internal only without access from the internet
+
+	a) Connected to Docker front-end network (and possibly back-end as well) 
+
+	b) Internally resolved with Bind9
+	
+	c) Only accessable if connected locally (or through VPN)
+			
+3) Back-end services
+
+	b) Connected to the Docker back-end network only
+
+### Volumes 
 
 I also prefer to use NFS Shared Folders on my Synology NAS to store any persistent data. This way it can be backed up using HyperBackup.
 
@@ -120,6 +202,12 @@ For example:
 
 In this example the AAAA record is pointing directly to the Traefik docker container. It assumes that it has a global IPV6 address.
 
-## Further Information for Bind9
+## Further Information for Other Services
+
+### Bind9
 
 Refer to the boilerplate for Bind9 which includes an example zone.homelab.domain.com file.
+
+### Authentik
+
+Refer to the boilerplate for Authentik.

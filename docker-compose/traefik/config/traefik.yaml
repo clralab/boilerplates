@@ -89,6 +89,8 @@ providers:
   docker:
     # -- (Optional) Enable this, if you want to expose all containers automatically
     exposedByDefault: false
+    # -- (Optional) Explicitly choose a network for Docker containers added with labels
+    network: clra_macvlan
   file:
     # -- (Optional) Use this for static routing and services outside Docker
     directory: /etc/traefik
