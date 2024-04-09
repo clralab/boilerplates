@@ -1,0 +1,112 @@
+services:
+  postgresql:
+    image: docker.io/library/postgres:12-alpine
+    container_name: authentik_postgresql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - vol_nfs_authentik_database:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - clra_bridge
+  redis:
+    image: docker.io/library/redis:alpine
+    container_name: authentik_redis
+    command: --save 60 1 --loglevel warning
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    volumes:
+      - redis:/data
+    networks:
+      - clra_bridge
+  server:
+    image: ghcr.io/goauthentik/server:2024.2.2
+    container_name: authentik_server
+    restart: unless-stopped
+    command: server
+    environment:
+      - authentik_REDIS__HOST=redis
+      - authentik_POSTGRESQL__HOST=postgresql
+      - authentik_POSTGRESQL__USER=${POSTGRES_USER}
+      - authentik_POSTGRESQL__NAME=${POSTGRES_DB}
+      - authentik_POSTGRESQL__PASSWORD=${POSTGRES_PASSWORD}
+      - authentik_ERROR_REPORTING__ENABLED=true
+      - authentik_SECRET_KEY=${authentik_SECRET_KEY}
+    volumes:
+      - ./media:/media
+      - ./custom-templates:/templates
+    #Port forwarding not required as covered by Traefik
+    #ports: 
+    #  - "9000:9000"
+    #  - "9443:9443"    
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authentik.rule=Host(`authentik.homelab.com`)"
+      - "traefik.http.routers.authentik.entrypoints=websecure"
+      - "traefik.http.routers.authentik.tls=true"
+      - "traefik.http.routers.authentik.tls.certresolver=production"
+      - "traefik.http.routers.authentik.service=authentik"
+      - "traefik.http.services.authentik.loadbalancer.server.port=9000"
+      # If explicit network is defined in Traefik yaml, network label not required
+      #- "traefik.docker.network=clra_macvlan"
+    depends_on:
+      - postgresql
+      - redis
+    networks:
+      clra_macvlan:
+        ipv4_address: 10.0.2.14
+        ipv6_address: 2001:db8:cafe::14
+      clra_bridge:
+  worker:
+    image: ghcr.io/goauthentik/server:2024.2.2
+    container_name: authentik_worker
+    restart: unless-stopped
+    command: worker
+    environment:
+      - authentik_REDIS__HOST=redis
+      - authentik_POSTGRESQL__HOST=postgresql
+      - authentik_POSTGRESQL__USER=${POSTGRES_USER}
+      - authentik_POSTGRESQL__NAME=${POSTGRES_DB}
+      - authentik_POSTGRESQL__PASSWORD=${POSTGRES_PASSWORD}
+      - authentik_ERROR_REPORTING__ENABLED=true
+      - authentik_SECRET_KEY=${authentik_SECRET_KEY}
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./media:/media
+      - ./certs:/certs
+      - ./custom-templates:/templates
+    depends_on:
+      - postgresql
+      - redis
+    networks:
+      - clra_bridge
+
+volumes:
+  vol_nfs_authentik_database:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/authentik"
+  redis:
+    driver: local
+
+networks:
+  clra_macvlan:
+    external: true
+  clra_bridge:
+    external: true
