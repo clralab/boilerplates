@@ -19,9 +19,9 @@ services:
     networks:
       clra_macvlan:
         ipv4_address: 10.0.2.22
-    ports:
-      - "3000:3000"
-      - "22:22"
+    #ports:
+    #  - "3000:3000"
+    #  - "22:22"
     volumes:
       - vol_prod:/data
     environment:
@@ -29,4 +29,12 @@ services:
       - DB_HOST=10.0.2.10:3306
       - DB_NAME= "[Gitea Database Name]"
       - DB_USER= "[Gitea User Name]"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gitea.rule=Host(`gitea.homelab.com`)"
+      - "traefik.http.routers.gitea.entrypoints=websecure"
+      - "traefik.http.routers.gitea.tls=true"
+      - "traefik.http.routers.gitea.tls.certresolver=production"
+      - "traefik.http.routers.gitea.service=gitea"
+      - "traefik.http.services.gitea.loadbalancer.server.port=3000"
     restart: always
