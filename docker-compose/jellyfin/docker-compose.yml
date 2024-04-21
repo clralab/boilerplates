@@ -41,7 +41,8 @@ services:
       resources:
         reservations:
           devices:
-            - count: all
+            - driver: nvidia
+              device_ids: ['0']
               capabilities: [ gpu ]
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
