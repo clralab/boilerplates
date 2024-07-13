@@ -1,23 +1,33 @@
-version: '3'
-
 networks:
   clra_macvlan:
     external: true
 
 volumes:
-  vol_nfs_homeassistant:
+  vol_prod_homeassistant:
     driver: local
     driver_opts:
       type: nfs
       o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
       device: ":/volume1/nfs_docker_prod/home_assistant"
+  vol_prod_faster_whisper_gpu:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/home_assistant/faster_whisper_gpu"
+  vol_prod_wyoming_piper:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/home_assistant/wyoming_piper"
 
 services:
   homeassistant:
     container_name: homeassistant
     image: "ghcr.io/home-assistant/home-assistant:stable"
     volumes:
-      - vol_nfs_homeassistant:/config
+      - vol_prod_homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     privileged: true
@@ -32,3 +42,53 @@ services:
       - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
       - "traefik.http.routers.homeassistant.tls=true"
       - "traefik.http.routers.homeassistant.tls.certresolver=production"
+
+  faster-whisper-gpu:
+    image: lscr.io/linuxserver/faster-whisper:gpu
+    container_name: faster-whisper-gpu
+    networks:
+      clra_macvlan:
+        ipv4_address: 10.0.2.32
+        ipv6_address: 2001:db8:cafe::32
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - WHISPER_MODEL=tiny-int8
+      - WHISPER_BEAM=1 #optional
+      - WHISPER_LANG=en #optional
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - vol_prod_faster_whisper_gpu:/config
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  wyoming-piper:
+    container_name: wyoming-piper
+    networks:
+      clra_macvlan:
+        ipv4_address: 10.0.2.31
+        ipv6_address: 2001:db8:cafe::31
+    image: rhasspy/wyoming-piper # no gpu
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - vol_prod_wyoming_piper:/data
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+    restart: unless-stopped
+    command: --voice en_US-lessac-medium
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

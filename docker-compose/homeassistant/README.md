@@ -168,3 +168,8 @@ Entity table for the Air Purifier:
 
 > :warning: Note that the timer has a spelling mistake. This is correct and must match the device value.
 
+## Setting up wyoming-piper and faster-whisper-gpu
+
+Thanks greatly to TechnoTim! Added this from his Self-Hosted AI Stack:
+
+<a href="https://technotim.live/posts/ai-stack-tutorial/">Techno Tim's AI Stack</a>
