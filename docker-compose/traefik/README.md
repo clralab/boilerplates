@@ -46,7 +46,7 @@ Thanks so much to <a href="https://community.traefik.io/t/docker-provider-how-do
 
 There are three ways I have found to fix this:
 
-1) Add an explicit network in the traefik.yaml file:
+1) Add an explicit network in the traefik.yml file:
 
 ```
 docker:
@@ -88,9 +88,10 @@ curl -v http://<service ip><service port>
 ```
 
 
-I have personally chosen to go with Option 1. The benefits for me is using Traefik as a reverse proxy to route traffic from the internet.
+I have personally chosen to go with all of the options excluding a connection to the back-end. 
+The benefit for me is using Traefik as a reverse proxy to route traffic from the internet.
 There is no need, at this stage, for me to resolve, get an SSL certificate, and/or route traffic from the internet to my back-end services.
-Or even my front-end services that I only plan to access when locally connected. Network config in the Traefik yaml saves me from forgetting labels.
+Or even my front-end services that I only plan to access when locally connected. Network config in the Traefik yml saves me from forgetting labels.
 
 Access to services can be overly simply summarised as:
 
@@ -201,6 +202,32 @@ For example:
 | CNAME	| *.homelab     | homelab.domain.com	| DNS only
 
 In this example the AAAA record is pointing directly to the Traefik docker container. It assumes that it has a global IPV6 address.
+
+I am also using CloudFlare DNS challenge using an API token for issuing the SSL Certificates. 
+
+1) Log into CloudFlare
+
+2) Go to your profile
+
+3) Click API Tokens on the left
+
+4) Create a new token
+
+5) Create a custom token
+
+	a) Token name = Traefik
+	 
+	b) Permissions, Zone Zone Read, Zone DNS Edit
+	
+	c) Zone resources, Include Specific Zone homelab.com
+
+6) Continue to summary
+
+7) Copy the token to a safe place
+
+8) Add the token to the environment variable in Portainer
+
+
 
 ## Further Information for Other Services
 

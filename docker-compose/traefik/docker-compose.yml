@@ -1,32 +1,50 @@
-version: '3.5'
+version: "3.8"
 
 volumes:
   vol_prod_config:
     driver: local
     driver_opts:
       type: nfs
-      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
-      device: ":/volume1/nfs_docker_prod/traefik/config"
+      o: addr=10.0.2.1,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/traefik3/"
 
 networks:
   clra_macvlan:
     external: true
-  # traefik_bridge:
-  #   external: true
 
 services:
-  traefik:
-    image: traefik:v2.10.4
-    container_name: traefik
+  traefik3:
+    image: traefik:v3.0
+    container_name: traefik3
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     networks:
       clra_macvlan:
         ipv4_address: 10.0.2.12
-    #   traefik_bridge:
+        ipv6_address: 2001:db8:cafe::12
     ports:
       - 80:80
       - 443:443
-      # - 8080:8080 - do not map to host, access from macvlan address
+      # - 443:443/tcp # Uncomment if you want HTTP3
+      # - 443:443/udp # Uncomment if you want HTTP3
+    environment:
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+      TRAEFIK_DASHBOARD_CREDENTIALS: ${TRAEFIK_DASHBOARD_CREDENTIALS}
+    # env_file: .env # use .env
     volumes:
-      - vol_prod_config:/etc/traefik
+      - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    restart: unless-stopped
+      - vol_prod_config:/etc/traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.homelab`)"
+      - "traefik.http.routers.traefik.middlewares=default-whitelist@file, traefik-auth"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=production"
+      - "traefik.http.routers.traefik.tls.domains[0].main=home.homelab"
+      - "traefik.http.routers.traefik.tls.domains[0].sans=*.home.homelab"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.services.traefik.loadbalancer.server.port=443"

@@ -1,0 +1,60 @@
+http:
+  routers:
+    dsm-router: # Synology DSM Router
+      entryPoints:
+        - websecure
+      rule: "Host(`dsm.domain`)"
+      service: dsm-service
+      tls: {}
+
+  services:
+    dsm-service: # Synology DSM Service
+      loadbalancer:
+        passHostHeader: true
+        servers:
+          - url: "https://10.0.0.1:5001"
+
+  middlewares:
+    https-redirectscheme:
+      redirectScheme:
+        scheme: https
+        permanent: true
+    default-headers:
+      headers:
+        frameDeny: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 15552000
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+
+    default-whitelist:
+      ipAllowList:
+        sourceRange:
+        - "10.0.0.0/8"
+        - "192.168.0.0/16"
+        - "172.16.0.0/12"
+        - "2001:db8:cafe::/64"
+
+    secured:
+      chain:
+        middlewares:
+        - default-whitelist
+        - default-headers
+
+tcp:
+  routers:
+    vpn-router: # Synology OpenVPN Router
+      entryPoints:
+        - websecure
+      rule: "HostSNI(`*`)"
+      service: vpn-service
+  services:
+    vpn-service: # Synology OpenVPN Service
+      loadbalancer:
+        servers:
+          - address: "10.0.2.1:1194"
