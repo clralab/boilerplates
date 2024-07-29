@@ -17,7 +17,7 @@ services:
       - "traefik.http.routers.portainer.rule=Host(`portainer.homelab.com`)"
       - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.routers.portainer.tls=true"
-      - "traefik.http.routers.portainer.tls.certresolver=production"
+      #- "traefik.http.routers.portainer.tls.certresolver=production" #Using wildcard from Traefik3
       - "traefik.http.routers.portainer.service=portainer"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     restart: unless-stopped

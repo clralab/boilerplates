@@ -41,7 +41,7 @@ services:
       - "traefik.http.routers.homeassistant.rule=Host(`homeassistant.homelab.domain.com`)"
       - "traefik.http.services.homeassistant.loadbalancer.server.port=8123"
       - "traefik.http.routers.homeassistant.tls=true"
-      - "traefik.http.routers.homeassistant.tls.certresolver=production"
+      #- "traefik.http.routers.homeassistant.tls.certresolver=production" #Using wildcard from Traefik3
 
   faster-whisper-gpu:
     image: lscr.io/linuxserver/faster-whisper:gpu

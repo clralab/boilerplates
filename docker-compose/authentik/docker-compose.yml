@@ -57,7 +57,7 @@ services:
       - "traefik.http.routers.authentik.rule=Host(`authentik.homelab.com`)"
       - "traefik.http.routers.authentik.entrypoints=websecure"
       - "traefik.http.routers.authentik.tls=true"
-      - "traefik.http.routers.authentik.tls.certresolver=production"
+      #- "traefik.http.routers.authentik.tls.certresolver=production" #Using wildcard from Traefik3
       - "traefik.http.routers.authentik.service=authentik"
       - "traefik.http.services.authentik.loadbalancer.server.port=9000"
       # If explicit network is defined in Traefik yaml, network label not required

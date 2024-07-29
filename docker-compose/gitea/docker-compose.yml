@@ -34,7 +34,7 @@ services:
       - "traefik.http.routers.gitea.rule=Host(`gitea.homelab.com`)"
       - "traefik.http.routers.gitea.entrypoints=websecure"
       - "traefik.http.routers.gitea.tls=true"
-      - "traefik.http.routers.gitea.tls.certresolver=production"
+      #- "traefik.http.routers.gitea.tls.certresolver=production" #Using wildcard from Traefik3
       - "traefik.http.routers.gitea.service=gitea"
       - "traefik.http.services.gitea.loadbalancer.server.port=3000"
     restart: always
