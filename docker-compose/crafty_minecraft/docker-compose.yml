@@ -1,0 +1,70 @@
+version: '3'
+
+volumes:
+  vol_prod_backups:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/crafty/backups"
+  vol_prod_logs:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/crafty/logs"
+  vol_prod_servers:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/crafty/servers"
+  vol_prod_config:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/crafty/config"
+  vol_prod_import:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=10.0.2.15,rw,noatime,rsize=8192,wsize=8192,tcp,timeo=14,nfsvers=4
+      device: ":/volume1/nfs_docker_prod/crafty/import"
+
+networks:
+  clra_macvlan:
+    external: true
+
+services:
+  crafty:
+    container_name: crafty_container
+    image: registry.gitlab.com/crafty-controller/crafty-4:latest
+    restart: always
+    environment:
+      - TZ=Australia/Sydney
+    networks:
+      clra_macvlan:
+        ipv4_address: 10.0.2.25
+        ipv6_address: 2001:db8:cafe::25
+    #ports:
+    #  - "8443:8443" # HTTPS
+    #  - "8123:8123" # DYNMAP
+    #  - "19132:19132/udp" # BEDROCK
+    #  - "25500-25600:25500-25600" # MC SERV PORT RANGE
+    volumes:
+      - vol_prod_backups:/crafty/backups
+      - vol_prod_logs:/crafty/logs
+      - vol_prod_servers:/crafty/servers
+      - vol_prod_config:/crafty/app/config
+      - vol_prod_import:/crafty/import
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.crafty.rule=Host(`crafty.homelab.com`)"
+      - "traefik.http.routers.crafty.entrypoints=websecure"
+      - "traefik.http.routers.crafty.middlewares=default-whitelist@file"
+      - "traefik.http.routers.crafty.tls=true"
+      - "traefik.http.routers.crafty.service=crafty"
+      - "traefik.http.services.crafty.loadbalancer.server.scheme=https"
+      - "traefik.http.services.crafty.loadbalancer.server.port=8443"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto = https"
